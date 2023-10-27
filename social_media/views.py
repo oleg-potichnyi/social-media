@@ -1,4 +1,5 @@
-from rest_framework import generics, mixins, status
+from django.contrib.auth import get_user_model
+from rest_framework import generics, mixins, status, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,11 +28,23 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 class UserProfileViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+
+class UserSearchView(generics.ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["username", "email"]
+
+    def get_queryset(self):
+        queryset = get_user_model().objects.all()
+        return queryset
 
 
 class LogoutView(APIView):
