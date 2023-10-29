@@ -20,4 +20,6 @@ RUN adduser \
 RUN chown -R django-user:django-user /vol/
 RUN chmod -R 755 /vol/web/
 
+RUN apt-get update && apt-get install -y redis-server
+
 USER django-user
