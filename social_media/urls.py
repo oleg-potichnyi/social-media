@@ -11,13 +11,15 @@ from social_media.views import (
     ManageUserView,
     LogoutView,
     UserProfileViewSet,
-    UserSearchView
+    UserSearchView,
+    PostViewSet,
 )
 
 app_name = "social_media"
 
 router = routers.DefaultRouter()
 router.register("user_profiles", UserProfileViewSet)
+router.register("post", PostViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
