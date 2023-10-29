@@ -84,3 +84,15 @@ def create_or_update_user_profile(sender, instance, created, **kwargs) -> None:
     if created:
         UserProfile.objects.create(user=instance)
     instance.userprofile.save()
+
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    scheduled_time = models.DateTimeField(null=True, blank=True)
+    is_scheduled = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
