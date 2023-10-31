@@ -1,4 +1,3 @@
-# Create your tasks here
 from datetime import datetime
 
 from social_media.models import Post

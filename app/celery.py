@@ -4,16 +4,16 @@ from datetime import timedelta
 from celery import Celery
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "social_media_api.settings")
 
-app = Celery("app")
+app = Celery("social_media_api")
 
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
 app.conf.beat_schedule = {
-    'schedule_post_task': {
-        'task': 'social_media.tasks.schedule_post_creation',
-        'schedule': timedelta(seconds=60),
+    "schedule_post_task": {
+        "task": "social_media.tasks.schedule_post_creation",
+        "schedule": timedelta(seconds=60),
     },
 }
 
