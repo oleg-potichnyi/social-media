@@ -10,6 +10,17 @@ This social media project is a web application that allows users to create accou
 * Secure and Scalable
 * Real-Time User Engagement
 
+## Environment Variables
+
+This project uses environment variables for sensitive information and configuration. Two files, `.env` and `.env_sample`, are provided:
+
+- `.env_sample` serves as a template with variable descriptions.
+- Create a copy of `.env_sample` and name it `.env` to set your environment-specific configuration.
+- Fill in the values for each variable in `.env`.
+- Keep `.env` secure and add it to your `.gitignore` to prevent accidental commits.
+
+Never commit the `.env` file to your version control system.
+
 ## Installation
 
 Python3 must be already installed
