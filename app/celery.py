@@ -4,9 +4,9 @@ from datetime import timedelta
 from celery import Celery
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "social_media_api.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
 
-app = Celery("social_media_api")
+app = Celery("social_media")
 
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
