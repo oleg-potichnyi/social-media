@@ -3,15 +3,19 @@ from rest_framework import mixins, status
 from rest_framework.generics import CreateAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from social_media.models import UserProfile, Post, UserRelationship
 from social_media.permissions import IsAdminOrIfAuthenticatedReadOnly
 from social_media.serializers import (
     UserProfileSerializer,
-    PostSerializer, UserRelationshipSerializer,
+    PostSerializer,
+    UserRelationshipSerializer,
 )
 from user.models import User
+from social_media.tasks import schedule_post_creation
 
 
 class UserProfileViewSet(
@@ -53,7 +57,7 @@ class FollowUserView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        user_to_follow_id = kwargs.get('user_id')
+        user_to_follow_id = kwargs.get("user_id")
         user_to_follow = get_object_or_404(User, id=user_to_follow_id)
 
         relationship, created = UserRelationship.objects.get_or_create(
@@ -64,12 +68,12 @@ class FollowUserView(CreateAPIView):
         if created:
             return Response(
                 {"message": "You are now following this user."},
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_201_CREATED,
             )
         else:
             return Response(
                 {"message": "You are already following this user."},
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
 
 
@@ -77,7 +81,7 @@ class UnfollowUserView(DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
-        user_to_unfollow_id = kwargs.get('user_id')
+        user_to_unfollow_id = kwargs.get("user_id")
         user_to_unfollow = get_object_or_404(User, id=user_to_unfollow_id)
 
         relationship = UserRelationship.objects.filter(
@@ -89,10 +93,26 @@ class UnfollowUserView(DestroyAPIView):
             relationship.delete()
             return Response(
                 {"message": "You have unfollowed this user."},
-                status=status.HTTP_204_NO_CONTENT
+                status=status.HTTP_204_NO_CONTENT,
             )
         else:
             return Response(
                 {"message": "You were not following this user."},
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
+
+
+class CreatePostView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user_profile_id = request.user.profile.id
+        content = request.data.get("content")
+        minutes_from_now = request.data.get("scheduled_minutes")
+
+        schedule_post_creation.apply_async([user_profile_id, content, minutes_from_now])
+
+        return Response(
+            {"message": "Post creation scheduled."}, status=status.HTTP_202_ACCEPTED
+        )
