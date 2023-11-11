@@ -14,5 +14,10 @@ def schedule_post_creation(user_profile_id, content, scheduled_time):
         post.save()
     else:
         schedule_post_creation.apply_async(
-            args=[user_profile_id, content], countdown=delay.total_seconds()
+            kwargs={
+                "user_profile_id": user_profile_id,
+                "content": content,
+                "scheduled_time": scheduled_time,
+            },
+            countdown=delay.total_seconds(),
         )

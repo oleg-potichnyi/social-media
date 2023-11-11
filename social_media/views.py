@@ -16,6 +16,7 @@ from social_media.serializers import (
 )
 from user.models import User
 from social_media.tasks import schedule_post_creation
+from social_media.scraper import schedule_post
 
 
 class UserProfileViewSet(
@@ -111,7 +112,7 @@ class CreatePostView(APIView):
         content = request.data.get("content")
         minutes_from_now = request.data.get("scheduled_minutes")
 
-        schedule_post_creation.apply_async([user_profile_id, content, minutes_from_now])
+        schedule_post(user_profile_id, content, minutes_from_now)
 
         return Response(
             {"message": "Post creation scheduled."}, status=status.HTTP_202_ACCEPTED
