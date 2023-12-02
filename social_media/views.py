@@ -15,7 +15,6 @@ from social_media.serializers import (
     UserRelationshipSerializer,
 )
 from user.models import User
-from social_media.tasks import schedule_post_creation
 from social_media.scraper import schedule_post
 
 
